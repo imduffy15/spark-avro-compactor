@@ -1,0 +1,5 @@
+language: scala
+scala:
+- 2.11.11
+after_success:
+- '[[ $TRAVIS_BRANCH == "master" ]] && { env; sbt -Dbintray.user=$BINTRAY_USER -Dbintray.pass=$BINTRAY_PASS publish; };'
