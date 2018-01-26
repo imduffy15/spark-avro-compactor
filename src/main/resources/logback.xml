@@ -13,10 +13,10 @@
     <logger name="org.apache.spark.storage" level="WARN"/>
     <logger name="org.apache.spark.scheduler" level="WARN"/>
     <logger name="org.apache.hadoop" level="WARN"/>
-    <logger name="org.apache.spark.ui" level="WARN" />
+    <logger name="org.apache.spark.ui" level="WARN"/>
     <logger name="org.apache.spark.sql.catalyst.expressions.codegen" level="WARN"/>
     <logger name="org.apache.spark.deploy.SparkHadoopUtil" level="INFO"/>
-    <logger name="org.apache.spark.memory" level="WARN" />
+    <logger name="org.apache.spark.memory" level="WARN"/>
     <logger name="org.apache.spark" level="WARN"/>
     <logger name="org.jets3t" level="WARN"/>
     <logger name="httpclient" level="WARN"/>

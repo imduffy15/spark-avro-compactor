@@ -1,8 +1,8 @@
 package ie.ianduffy.spark.avro.compactor
 
 import com.amazonaws.auth.{AWSSessionCredentials, DefaultAWSCredentialsProviderChain}
-import Runner.config
-import org.apache.spark.sql.SparkSession
+import ie.ianduffy.spark.avro.compactor.Utils._
+import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient
 import org.slf4j.LoggerFactory
 
 import scala.util.{Failure, Success, Try}
@@ -13,6 +13,10 @@ object Runner extends App {
 
   private val config = JobConfig.parse(args)
 
+  private val schemaRegistry = new CachedSchemaRegistryClient(config.schemaRegistryUrl, 10000)
+
+  log.info(s"Running with application config $config")
+
   if (System.getenv("local") != null) {
     log.info(s"Running with embedded spark")
     runLocally(config)
@@ -20,8 +24,6 @@ object Runner extends App {
     log.info("Running with remote spark")
     run(config)
   }
-
-  log.info(s"Running with application config $config")
 
   def runLocally(config: JobConfig) = {
     val credentials = new DefaultAWSCredentialsProviderChain().getCredentials.asInstanceOf[AWSSessionCredentials]
@@ -35,12 +37,12 @@ object Runner extends App {
     System.setProperty("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.TemporaryAWSCredentialsProvider")
     System.setProperty("com.amazonaws.services.s3.enforceV4", "true")
 
-    val spark = SparkSession.builder.getOrCreate
+    val spark = createSparkSession
 
     log.info(s"Running with spark configuration: ${spark.conf.getAll}")
 
     Try {
-      Job.run(spark, config)
+      Job.run(spark, schemaRegistry, config)
     } match {
       case Success(_) =>
         spark.close()
@@ -53,9 +55,9 @@ object Runner extends App {
   }
 
   def run(config: JobConfig) = {
-    val spark = SparkSession.builder.getOrCreate
+    val spark = createSparkSession
     log.info(s"Running with configuration: ${spark.conf.getAll}")
-    Job.run(spark, config)
+    Job.run(spark, schemaRegistry, config)
   }
 
 }
